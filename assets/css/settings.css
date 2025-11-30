@@ -70,6 +70,25 @@
     transition: all 0.3s ease;
 }
 
+.setting-input[type="text"],
+.setting-input[type="number"] {
+    cursor: text;
+}
+
+.setting-input[type="range"] {
+    cursor: pointer;
+    height: 8px;
+    padding: 0;
+}
+
+#temperatureValue {
+    display: inline-block;
+    margin-left: 10px;
+    color: #667eea;
+    font-weight: 600;
+    min-width: 40px;
+}
+
 .setting-input:focus {
     outline: none;
     border-color: #667eea;

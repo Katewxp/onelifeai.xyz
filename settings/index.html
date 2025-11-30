@@ -17,13 +17,16 @@
     <!-- Navigation -->
     <nav class="nav">
         <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="nav-main">
                 <a href="/" class="nav-logo">OneLife</a>
                 <div class="nav-links">
                     <a href="/tools" class="nav-link">Tools</a>
                     <a href="/ai/chat" class="nav-link">AI Chat</a>
                     <a href="/records" class="nav-link">Records</a>
                 </div>
+            </div>
+            <div class="nav-support">
+                Powered by <a href="https://www.gradientparallax.com" target="_blank" rel="noopener">Gradient Parallax</a>
             </div>
         </div>
     </nav>
@@ -37,17 +40,41 @@
             </div>
 
             <div class="settings-content">
-                <!-- Model Settings -->
+                <!-- Gradient Parallax Settings -->
                 <div class="settings-section">
-                    <h2 class="section-title">🤖 AI Model</h2>
+                    <h2 class="section-title">🤖 Gradient Parallax AI</h2>
                     <div class="setting-item">
-                        <label>Local Model</label>
+                        <label>Service URL</label>
+                        <input type="text" class="setting-input" id="gradientParallaxUrl" placeholder="http://localhost:5000">
+                        <p class="setting-description">The URL where your Gradient Parallax service is running. Default: http://localhost:5000</p>
+                    </div>
+                    <div class="setting-item">
+                        <label>AI Model</label>
                         <select class="setting-input" id="modelSelect">
-                            <option value="webgpu">WebGPU (Recommended)</option>
-                            <option value="wasm">WebAssembly</option>
-                            <option value="cpu">CPU Fallback</option>
+                            <option value="llama-3.1-8b-instruct">Llama 3.1 8B Instruct</option>
+                            <option value="llama-3.1-70b-instruct">Llama 3.1 70B Instruct</option>
+                            <option value="mistral-7b-instruct">Mistral 7B Instruct</option>
+                            <option value="mixtral-8x7b-instruct">Mixtral 8x7B Instruct</option>
+                            <option value="phi-3-mini">Phi-3 Mini</option>
+                            <option value="phi-3-medium">Phi-3 Medium</option>
+                            <option value="gemma-7b-it">Gemma 7B IT</option>
                         </select>
-                        <p class="setting-description">Choose your local AI model runtime. WebGPU provides best performance.</p>
+                        <p class="setting-description">Choose your Gradient Parallax AI model. Make sure the model is available in your Gradient Parallax installation.</p>
+                    </div>
+                    <div class="setting-item">
+                        <label>Temperature</label>
+                        <input type="range" class="setting-input" id="temperatureSlider" min="0" max="2" step="0.1" value="0.7">
+                        <span id="temperatureValue">0.7</span>
+                        <p class="setting-description">Controls randomness. Lower = more focused, Higher = more creative.</p>
+                    </div>
+                    <div class="setting-item">
+                        <label>Max Tokens</label>
+                        <input type="number" class="setting-input" id="maxTokens" min="100" max="4000" step="100" value="1000">
+                        <p class="setting-description">Maximum number of tokens in the response. Higher values allow longer responses.</p>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn-secondary" id="testConnectionBtn">Test Connection</button>
+                        <p class="setting-description" id="connectionStatus">Click to test connection to Gradient Parallax service.</p>
                     </div>
                 </div>
 
