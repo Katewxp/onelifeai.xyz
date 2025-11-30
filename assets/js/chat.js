@@ -151,7 +151,7 @@ const updateStatus = (text, status) => {
 };
 
 // Call Gradient Parallax API
-const callGradientParallax = async (message) => {
+const callGradientParallax = async (message, contextData = null) => {
     const settings = getSettings();
     const apiUrl = `${settings.gradientParallaxUrl}/v1/chat/completions`;
     
@@ -165,12 +165,12 @@ const callGradientParallax = async (message) => {
     }
     
     // Build context-aware system prompt
-    const systemPrompt = `You are a helpful local AI assistant for OneLife, a privacy-first life management app.
+    let systemPrompt = `You are a helpful local AI assistant for OneLife, a privacy-first life management app.
 
 Your main tasks:
 1. Help users record and organize their life data (expenses, tasks, moods, health, notes)
 2. Answer questions about their data
-3. Provide insights and summaries
+3. Provide insights and summaries based on their stored records
 4. Help plan schedules
 
 IMPORTANT INSTRUCTIONS:
@@ -178,12 +178,82 @@ IMPORTANT INSTRUCTIONS:
 - When users mention tasks or reminders, acknowledge and confirm it's been added
 - When users mention moods or feelings, respond empathetically and confirm it's been logged
 - When users mention health data, acknowledge and confirm it's been tracked
-- Keep responses concise (1-2 sentences), friendly, and helpful
+- When users ask for summaries or reports, analyze the provided data and generate helpful insights
+- Keep responses concise (1-2 sentences for simple confirmations, but detailed for summaries/reports)
 - Always confirm when data has been recorded
 - Do NOT include any reasoning tags, thinking process, or <think> tags in your response
 - Provide ONLY the direct, helpful response to the user
 
 Example good response: "Got it! I've recorded your $35 lunch expense in the Food & Dining category. Anything else you'd like to track today?"`;
+
+    // Add context data if available (for summaries/reports)
+    let userMessage = message;
+    if (contextData && contextData.length > 0) {
+        systemPrompt += `\n\nWhen generating summaries or reports, you have access to the user's stored records. Analyze them and provide meaningful insights.`;
+        
+        // Format context data for the AI
+        const contextText = formatRecordsForAI(contextData);
+        userMessage = `${message}\n\nHere is the relevant data from the user's records:\n${contextText}`;
+    } else if (contextData && contextData.length === 0) {
+        userMessage = `${message}\n\nNote: No records found for this request.`;
+    }
+    
+    // Helper function to format records for AI
+    function formatRecordsForAI(records) {
+        if (!records || records.length === 0) return 'No records found.';
+        
+        const grouped = {};
+        records.forEach(record => {
+            if (!grouped[record.type]) {
+                grouped[record.type] = [];
+            }
+            grouped[record.type].push(record);
+        });
+        
+        let formatted = '';
+        Object.keys(grouped).forEach(type => {
+            const typeRecords = grouped[type];
+            formatted += `\n${type.toUpperCase()} Records (${typeRecords.length}):\n`;
+            
+            typeRecords.forEach(record => {
+                const date = new Date(record.date).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                if (type === 'expense') {
+                    formatted += `- ${date}: $${record.amount} - ${record.category || 'Uncategorized'} (${record.description || 'No description'})\n`;
+                } else if (type === 'mood') {
+                    formatted += `- ${date}: ${record.mood || 'Neutral'} - ${record.description || 'No description'}\n`;
+                } else if (type === 'todo') {
+                    formatted += `- ${date}: ${record.completed ? '✅ Completed' : '⏳ Pending'} - ${record.description || 'No description'}\n`;
+                } else {
+                    formatted += `- ${date}: ${record.description || 'No description'}\n`;
+                }
+            });
+        });
+        
+        // Add summary statistics
+        const expenses = grouped['expense'] || [];
+        if (expenses.length > 0) {
+            const total = expenses.reduce((sum, r) => sum + (r.amount || 0), 0);
+            const avg = total / expenses.length;
+            formatted += `\nExpense Summary: Total: $${total.toFixed(2)}, Average: $${avg.toFixed(2)}, Count: ${expenses.length}\n`;
+        }
+        
+        const moods = grouped['mood'] || [];
+        if (moods.length > 0) {
+            const moodCounts = {};
+            moods.forEach(m => {
+                const mood = m.mood || 'Neutral';
+                moodCounts[mood] = (moodCounts[mood] || 0) + 1;
+            });
+            formatted += `\nMood Summary: ${Object.entries(moodCounts).map(([mood, count]) => `${mood}: ${count}`).join(', ')}\n`;
+        }
+        
+        return formatted;
+    }
 
     const requestBody = {
         model: settings.model || 'Qwen/Qwen3-0.6B',
@@ -194,7 +264,7 @@ Example good response: "Got it! I've recorded your $35 lunch expense in the Food
             },
             {
                 role: 'user',
-                content: message
+                content: userMessage
             }
         ],
         temperature: settings.temperature || 0.7,
@@ -298,9 +368,80 @@ Example good response: "Got it! I've recorded your $35 lunch expense in the Food
     };
 };
 
+// Check if user is requesting a summary or report
+const isSummaryRequest = (message) => {
+    const lower = message.toLowerCase();
+    const summaryKeywords = [
+        'summary', 'summarize', 'report', 'analyze', 'analysis',
+        'show me', 'tell me about', 'how much', 'what did i',
+        'monthly', 'weekly', 'daily', 'this month', 'this week',
+        'expenses', 'spending', 'mood', 'health', 'todos',
+        'trend', 'insight', 'overview', 'recap'
+    ];
+    return summaryKeywords.some(keyword => lower.includes(keyword));
+};
+
+// Get relevant records for summary
+const getRelevantRecords = async (message) => {
+    const lower = message.toLowerCase();
+    let type = null;
+    let timeRange = 'all';
+    
+    // Determine record type
+    if (lower.includes('expense') || lower.includes('spending') || lower.includes('spent')) {
+        type = 'expense';
+    } else if (lower.includes('mood') || lower.includes('feeling')) {
+        type = 'mood';
+    } else if (lower.includes('health') || lower.includes('exercise') || lower.includes('workout')) {
+        type = 'health';
+    } else if (lower.includes('todo') || lower.includes('task')) {
+        type = 'todo';
+    }
+    
+    // Determine time range
+    const now = new Date();
+    if (lower.includes('today')) {
+        timeRange = 'today';
+    } else if (lower.includes('this week') || lower.includes('week')) {
+        timeRange = 'week';
+    } else if (lower.includes('this month') || lower.includes('month')) {
+        timeRange = 'month';
+    }
+    
+    const allRecords = await OneLife.DB.getRecords(type);
+    
+    // Filter by time range
+    let filteredRecords = allRecords;
+    if (timeRange !== 'all') {
+        const cutoffDate = new Date();
+        if (timeRange === 'today') {
+            cutoffDate.setHours(0, 0, 0, 0);
+        } else if (timeRange === 'week') {
+            cutoffDate.setDate(cutoffDate.getDate() - 7);
+        } else if (timeRange === 'month') {
+            cutoffDate.setMonth(cutoffDate.getMonth() - 1);
+        }
+        filteredRecords = allRecords.filter(record => new Date(record.date) >= cutoffDate);
+    }
+    
+    return filteredRecords;
+};
+
 // Process message with local AI and data extraction
 const processMessage = async (message) => {
     const lowerMessage = message.toLowerCase();
+    
+    // Check if this is a summary/report request
+    let contextData = null;
+    if (isSummaryRequest(message)) {
+        try {
+            updateStatus('Loading your data...', 'checking');
+            contextData = await getRelevantRecords(message);
+            console.log('Loaded records for summary:', contextData.length);
+        } catch (error) {
+            console.error('Error loading records:', error);
+        }
+    }
     
     // Try to call Gradient Parallax first
     let aiResponse = '';
@@ -308,7 +449,8 @@ const processMessage = async (message) => {
     if (isServiceAvailable) {
         try {
             updateStatus('AI is thinking...', 'checking');
-            const response = await callGradientParallax(message);
+            // Pass context data if available
+            const response = await callGradientParallax(message, contextData);
             aiResponse = response.content;
             aiReasoning = response.reasoning;
             updateStatus('Connected to Gradient Parallax', 'connected');
