@@ -1,0 +1,11 @@
+{
+  "name": "onelifeai.xyz",
+  "version": "1.0.0",
+  "description": "OneLife - Your Life. One Local AI.",
+  "scripts": {
+    "generate-images": "node tools/generate-images-node.js"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2"
+  }
+}
