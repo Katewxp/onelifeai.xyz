@@ -92,7 +92,7 @@ const showServiceWarning = () => {
                 <li>Refresh this page after starting the service</li>
             </ol>
             <p>
-                <a href="https://www.gradientparallax.com" target="_blank" rel="noopener">Learn more about Gradient Parallax →</a>
+                <a href="https://www.gradient.network/" target="_blank" rel="noopener">Learn more about Gradient Parallax →</a>
             </p>
             <button onclick="location.reload()" class="btn-primary" style="margin-top: 15px;">Retry Connection</button>
         </div>

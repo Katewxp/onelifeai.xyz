@@ -41,7 +41,8 @@ body {
 /* Navigation */
 .nav {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     padding: 20px 0;
     position: sticky;
     top: 0;
@@ -59,12 +60,10 @@ body {
 }
 
 .nav-support {
-    text-align: center;
-    padding-top: 10px;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 10px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-left: 20px;
+    white-space: nowrap;
 }
 
 .nav-support a {
