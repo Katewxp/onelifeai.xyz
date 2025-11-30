@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - OneLife | Configure Your Local AI</title>
+    <meta name="description" content="Configure your OneLife settings. Model selection, privacy options, backup, and notifications.">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/settings.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <a href="/" class="nav-logo">OneLife</a>
+                <div class="nav-links">
+                    <a href="/tools" class="nav-link">Tools</a>
+                    <a href="/ai/chat" class="nav-link">AI Chat</a>
+                    <a href="/records" class="nav-link">Records</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Settings Container -->
+    <div class="settings-container">
+        <div class="container">
+            <div class="settings-header">
+                <h1>Settings</h1>
+                <p class="settings-subtitle">Configure your local AI assistant</p>
+            </div>
+
+            <div class="settings-content">
+                <!-- Model Settings -->
+                <div class="settings-section">
+                    <h2 class="section-title">🤖 AI Model</h2>
+                    <div class="setting-item">
+                        <label>Local Model</label>
+                        <select class="setting-input" id="modelSelect">
+                            <option value="webgpu">WebGPU (Recommended)</option>
+                            <option value="wasm">WebAssembly</option>
+                            <option value="cpu">CPU Fallback</option>
+                        </select>
+                        <p class="setting-description">Choose your local AI model runtime. WebGPU provides best performance.</p>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="settings-section">
+                    <h2 class="section-title">🔒 Privacy</h2>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" class="toggle-input" id="analyticsToggle" checked disabled>
+                            <span class="toggle-slider"></span>
+                            <span>Analytics (Disabled - No tracking)</span>
+                        </label>
+                        <p class="setting-description">OneLife runs 100% locally. No analytics, no tracking, no data collection.</p>
+                    </div>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" class="toggle-input" id="encryptionToggle" checked>
+                            <span class="toggle-slider"></span>
+                            <span>Local Data Encryption</span>
+                        </label>
+                        <p class="setting-description">Encrypt your data locally using AES encryption. All data stays on your device.</p>
+                    </div>
+                </div>
+
+                <!-- Backup Settings -->
+                <div class="settings-section">
+                    <h2 class="section-title">💾 Backup & Export</h2>
+                    <div class="setting-item">
+                        <button class="btn-secondary" id="exportBtn">Export All Data</button>
+                        <p class="setting-description">Download all your life records as a JSON file. Keep it safe!</p>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn-secondary" id="importBtn">Import Data</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                        <p class="setting-description">Restore your data from a previously exported file.</p>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn-danger" id="clearBtn">Clear All Data</button>
+                        <p class="setting-description warning">⚠️ This will permanently delete all your records. This action cannot be undone.</p>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="settings-section">
+                    <h2 class="section-title">🔔 Notifications</h2>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" class="toggle-input" id="notificationsToggle">
+                            <span class="toggle-slider"></span>
+                            <span>Browser Notifications</span>
+                        </label>
+                        <p class="setting-description">Receive reminders and alerts for your scheduled tasks.</p>
+                    </div>
+                </div>
+
+                <!-- About -->
+                <div class="settings-section">
+                    <h2 class="section-title">ℹ️ About</h2>
+                    <div class="setting-item">
+                        <p class="setting-description">
+                            <strong>OneLife v1.0.0</strong><br>
+                            Your life. One local AI.<br><br>
+                            All data is stored locally on your device using IndexedDB.<br>
+                            No cloud servers. No tracking. Complete privacy.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/settings.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Records - OneLife | Your Private Life Database</title>
+    <meta name="description" content="View and manage your life records. Expenses, moods, health data, todos, and more. All stored locally on your device.">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/records.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <a href="/" class="nav-logo">OneLife</a>
+                <div class="nav-links">
+                    <a href="/tools" class="nav-link">Tools</a>
+                    <a href="/ai/chat" class="nav-link">AI Chat</a>
+                    <a href="/settings" class="nav-link">Settings</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Records Container -->
+    <div class="records-container">
+        <div class="container">
+            <div class="records-header">
+                <h1>Life Records Hub</h1>
+                <p class="records-subtitle">Your private life database • All data stored locally</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="records-tabs">
+                <button class="tab-btn active" data-tab="all">All Records</button>
+                <button class="tab-btn" data-tab="expenses">💰 Expenses</button>
+                <button class="tab-btn" data-tab="todos">📅 Todos</button>
+                <button class="tab-btn" data-tab="mood">😊 Mood</button>
+                <button class="tab-btn" data-tab="health">💪 Health</button>
+                <button class="tab-btn" data-tab="notes">📝 Notes</button>
+            </div>
+
+            <!-- Records List -->
+            <div class="records-list" id="recordsList">
+                <div class="empty-state">
+                    <div class="empty-icon">📚</div>
+                    <h3>No records yet</h3>
+                    <p>Start chatting with AI to record your life events, or add records manually.</p>
+                    <a href="/ai/chat" class="btn-primary">Start Recording</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/records.js"></script>
+</body>
+</html>
+
