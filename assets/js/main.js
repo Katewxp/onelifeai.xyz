@@ -104,6 +104,12 @@ const DB = {
                 if (!db.objectStoreNames.contains('embeddings')) {
                     db.createObjectStore('embeddings', { keyPath: 'id', autoIncrement: true });
                 }
+                
+                // Chat history store
+                if (!db.objectStoreNames.contains('chatHistory')) {
+                    const chatStore = db.createObjectStore('chatHistory', { keyPath: 'id', autoIncrement: true });
+                    chatStore.createIndex('timestamp', 'timestamp', { unique: false });
+                }
             };
         });
     },
@@ -139,6 +145,72 @@ const DB = {
             const store = transaction.objectStore('records');
             const request = store.delete(id);
             request.onsuccess = () => resolve(true);
+            request.onerror = () => reject(request.error);
+        });
+    },
+    
+    // Chat history management
+    saveChatMessage: async (message, isUser = false, reasoning = null) => {
+        if (!DB.db) await DB.init();
+        return new Promise((resolve, reject) => {
+            const transaction = DB.db.transaction(['chatHistory'], 'readwrite');
+            const store = transaction.objectStore('chatHistory');
+            const chatMessage = {
+                message: message,
+                isUser: isUser,
+                reasoning: reasoning,
+                timestamp: Date.now()
+            };
+            const request = store.add(chatMessage);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    },
+    
+    getChatHistory: async (days = 3) => {
+        if (!DB.db) await DB.init();
+        return new Promise((resolve, reject) => {
+            const transaction = DB.db.transaction(['chatHistory'], 'readonly');
+            const store = transaction.objectStore('chatHistory');
+            const index = store.index('timestamp');
+            
+            // Calculate cutoff time (3 days ago)
+            const cutoffTime = Date.now() - (days * 24 * 60 * 60 * 1000);
+            
+            const request = index.getAll(IDBKeyRange.lowerBound(cutoffTime));
+            request.onsuccess = () => {
+                // Sort by timestamp (oldest first)
+                const messages = request.result.sort((a, b) => a.timestamp - b.timestamp);
+                resolve(messages);
+            };
+            request.onerror = () => reject(request.error);
+        });
+    },
+    
+    cleanupOldChatHistory: async (days = 3) => {
+        if (!DB.db) await DB.init();
+        return new Promise((resolve, reject) => {
+            const transaction = DB.db.transaction(['chatHistory'], 'readwrite');
+            const store = transaction.objectStore('chatHistory');
+            const index = store.index('timestamp');
+            
+            // Calculate cutoff time (3 days ago)
+            const cutoffTime = Date.now() - (days * 24 * 60 * 60 * 1000);
+            
+            // Get all messages older than cutoff
+            const request = index.openCursor(IDBKeyRange.upperBound(cutoffTime));
+            let deletedCount = 0;
+            
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    cursor.delete();
+                    deletedCount++;
+                    cursor.continue();
+                } else {
+                    resolve(deletedCount);
+                }
+            };
             request.onerror = () => reject(request.error);
         });
     }

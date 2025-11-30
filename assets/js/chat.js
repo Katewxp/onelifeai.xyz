@@ -543,7 +543,7 @@ const detectMood = (message) => {
     return 'Neutral';
 };
 
-const addMessage = (text, isUser = false, reasoning = null) => {
+const addMessage = async (text, isUser = false, reasoning = null) => {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${isUser ? 'user-message' : 'ai-message'}`;
     
@@ -581,6 +581,15 @@ const addMessage = (text, isUser = false, reasoning = null) => {
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);
     chatMessages.appendChild(messageDiv);
+    
+    // Save message to chat history (only save actual messages, not confirmations)
+    if (!text.startsWith('✅')) {
+        try {
+            await OneLife.DB.saveChatMessage(text, isUser, reasoning);
+        } catch (error) {
+            console.error('Error saving chat message:', error);
+        }
+    }
     
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -622,7 +631,7 @@ const sendMessage = async () => {
     }
     
     // Add user message
-    addMessage(message, true);
+    await addMessage(message, true);
     chatInput.value = '';
     chatInput.disabled = true;
     sendButton.disabled = true;
@@ -633,20 +642,20 @@ const sendMessage = async () => {
     try {
         const response = await processMessage(message);
         hideTyping();
-        addMessage(response.text, false, response.reasoning);
+        await addMessage(response.text, false, response.reasoning);
         
         // Show confirmation if data was recorded
         if (response.structuredData) {
             const confirmMsg = response.structuredData.type === 'expense' 
                 ? `✅ ${response.structuredData.type} recorded: $${response.structuredData.amount || ''}`
                 : `✅ ${response.structuredData.type} recorded`;
-            setTimeout(() => {
-                addMessage(confirmMsg, false);
+            setTimeout(async () => {
+                await addMessage(confirmMsg, false);
             }, 500);
         }
     } catch (error) {
         hideTyping();
-        addMessage('Sorry, I encountered an error. Please try again or check your local AI service connection.', false);
+        await addMessage('Sorry, I encountered an error. Please try again or check your local AI service connection.', false);
         console.error('Error:', error);
     } finally {
         chatInput.disabled = false;
@@ -680,8 +689,35 @@ if (showReasoningToggle) {
     });
 }
 
+// Load chat history on page load
+const loadChatHistory = async () => {
+    try {
+        // Clean up old messages (older than 3 days)
+        await OneLife.DB.cleanupOldChatHistory(3);
+        
+        // Load recent messages (last 3 days)
+        const history = await OneLife.DB.getChatHistory(3);
+        
+        if (history && history.length > 0) {
+            // Clear welcome message if history exists
+            const welcomeMsg = chatMessages.querySelector('.ai-message');
+            if (welcomeMsg && welcomeMsg.classList.contains('welcome-message')) {
+                welcomeMsg.remove();
+            }
+            
+            // Restore messages
+            for (const msg of history) {
+                await addMessage(msg.message, msg.isUser, msg.reasoning);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading chat history:', error);
+    }
+};
+
 // Initialize on load
-window.addEventListener('load', () => {
-    initializeService();
+window.addEventListener('load', async () => {
+    await initializeService();
+    await loadChatHistory();
     chatInput.focus();
 });
