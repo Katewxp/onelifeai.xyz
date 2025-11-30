@@ -162,13 +162,17 @@ Your main tasks:
 3. Provide insights and summaries
 4. Help plan schedules
 
-When users mention expenses (e.g., "I spent $X on Y"), acknowledge it naturally and confirm it's been recorded.
-When users mention tasks or reminders, acknowledge and confirm it's been added to their calendar.
-When users mention moods or feelings, acknowledge empathetically and confirm it's been logged.
-When users mention health data (steps, exercise, sleep, etc.), acknowledge and confirm it's been tracked.
+IMPORTANT INSTRUCTIONS:
+- When users mention expenses (e.g., "I spent $35 on lunch today"), respond naturally like: "Got it! I've recorded your $35 lunch expense. Is there anything else you'd like to track?"
+- When users mention tasks or reminders, acknowledge and confirm it's been added
+- When users mention moods or feelings, respond empathetically and confirm it's been logged
+- When users mention health data, acknowledge and confirm it's been tracked
+- Keep responses concise (1-2 sentences), friendly, and helpful
+- Always confirm when data has been recorded
+- Do NOT include any reasoning tags, thinking process, or <think> tags in your response
+- Provide ONLY the direct, helpful response to the user
 
-Keep responses concise, friendly, and helpful. Always confirm when data has been recorded.
-Do NOT include reasoning tags or thinking process in your response - just provide the direct, helpful response.`;
+Example good response: "Got it! I've recorded your $35 lunch expense in the Food & Dining category. Anything else you'd like to track today?"`;
 
     const requestBody = {
         model: settings.model || 'Qwen/Qwen3-0.6B',
@@ -212,7 +216,7 @@ Do NOT include reasoning tags or thinking process in your response - just provid
     if (data.choices?.[0]?.message?.content) {
         content = data.choices[0].message.content;
     }
-    // Try alternative format: choices[0].messages.content
+    // Try alternative format: choices[0].messages.content (Gradient Parallax format)
     else if (data.choices?.[0]?.messages?.content) {
         content = data.choices[0].messages.content;
     }
@@ -226,8 +230,10 @@ Do NOT include reasoning tags or thinking process in your response - just provid
         return 'Sorry, I could not generate a response. The API returned an unexpected format.';
     }
     
-    // Filter out reasoning tags (like <think>...</think>)
+    // Filter out reasoning tags (like <think>...</think> or <think>...</think>)
     content = content.replace(/<think>[\s\S]*?<\/redacted_reasoning>/gi, '');
+    content = content.replace(/<think>/gi, '');
+    content = content.replace(/<think>[\s\S]*?<\/think>/gi, '');
     content = content.replace(/<think>/gi, '');
     content = content.trim();
     
