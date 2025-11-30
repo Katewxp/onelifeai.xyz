@@ -89,13 +89,22 @@ const createRecordHTML = (record) => {
     }
 
     return `
-        <div class="record-item ${typeClass}">
+        <div class="record-item ${typeClass}" data-record-id="${record.id}">
             <div class="record-header">
                 <div class="record-type">
                     <span>${typeIcon}</span>
                     <span>${typeName}</span>
                 </div>
-                <div class="record-date">${dateStr}</div>
+                <div class="record-actions">
+                    <div class="record-date">${dateStr}</div>
+                    <button class="delete-btn" data-record-id="${record.id}" title="Delete record">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <div class="record-content">
                 ${contentHTML}
@@ -119,6 +128,42 @@ tabButtons.forEach(btn => {
         const type = currentTab === 'all' ? null : currentTab;
         loadRecords(type);
     });
+});
+
+// Delete record
+const deleteRecord = async (id) => {
+    if (!confirm('Are you sure you want to delete this record? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        await OneLife.DB.deleteRecord(id);
+        // Remove from UI immediately
+        const recordItem = document.querySelector(`[data-record-id="${id}"]`);
+        if (recordItem) {
+            recordItem.style.opacity = '0';
+            recordItem.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                // Reload records to update the list
+                const type = currentTab === 'all' ? null : currentTab;
+                loadRecords(type);
+            }, 300);
+        }
+    } catch (error) {
+        console.error('Error deleting record:', error);
+        alert('Failed to delete record. Please try again.');
+    }
+};
+
+// Handle delete button clicks (event delegation)
+recordsList.addEventListener('click', (e) => {
+    if (e.target.closest('.delete-btn')) {
+        const btn = e.target.closest('.delete-btn');
+        const recordId = parseInt(btn.dataset.recordId);
+        if (recordId) {
+            deleteRecord(recordId);
+        }
+    }
 });
 
 // Initial load

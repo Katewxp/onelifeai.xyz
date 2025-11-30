@@ -130,6 +130,17 @@ const DB = {
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
         });
+    },
+    
+    deleteRecord: async (id) => {
+        if (!DB.db) await DB.init();
+        return new Promise((resolve, reject) => {
+            const transaction = DB.db.transaction(['records'], 'readwrite');
+            const store = transaction.objectStore('records');
+            const request = store.delete(id);
+            request.onsuccess = () => resolve(true);
+            request.onerror = () => reject(request.error);
+        });
     }
 };
 

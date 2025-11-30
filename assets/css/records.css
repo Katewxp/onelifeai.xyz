@@ -82,6 +82,12 @@
     margin-bottom: 10px;
 }
 
+.record-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .record-type {
     display: flex;
     align-items: center;
@@ -93,6 +99,36 @@
 .record-date {
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.85rem;
+}
+
+.delete-btn {
+    background: rgba(245, 87, 108, 0.1);
+    border: 1px solid rgba(245, 87, 108, 0.3);
+    border-radius: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: rgba(245, 87, 108, 0.8);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+}
+
+.delete-btn:hover {
+    background: rgba(245, 87, 108, 0.2);
+    border-color: rgba(245, 87, 108, 0.5);
+    color: #f5576c;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
+}
+
+.record-item {
+    position: relative;
 }
 
 .record-content {
