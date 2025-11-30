@@ -60,12 +60,22 @@ body {
 }
 
 .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 1.5rem;
     font-weight: 700;
     background: var(--primary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    text-decoration: none;
+}
+
+.nav-logo img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
 }
 
 .nav-links {
