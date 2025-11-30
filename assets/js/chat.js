@@ -8,7 +8,7 @@ const chatStatus = document.getElementById('chatStatus');
 
 // Gradient Parallax configuration
 const GRADIENT_PARALLAX_CONFIG = {
-    baseUrl: 'http://localhost:5000', // Default Gradient Parallax local server
+    baseUrl: 'http://localhost:3001', // Default Gradient Parallax local server
     apiEndpoint: '/api/v1/chat/completions',
     timeout: 30000
 };
@@ -16,7 +16,7 @@ const GRADIENT_PARALLAX_CONFIG = {
 // Get settings from localStorage
 const getSettings = () => {
     return OneLife.Storage.get('settings', {
-        gradientParallaxUrl: GRADIENT_PARALLAX_CONFIG.baseUrl,
+        gradientParallaxUrl: 'http://localhost:3001',
         model: 'llama-3.1-8b-instruct',
         temperature: 0.7,
         maxTokens: 1000
@@ -88,7 +88,7 @@ const showServiceWarning = () => {
             <p><strong>To start the service:</strong></p>
             <ol>
                 <li>Install and start Gradient Parallax on your device</li>
-                <li>Ensure the service is running on <code>${getSettings().gradientParallaxUrl}</code></li>
+                <li>Ensure the service is running on <code>http://localhost:3001</code></li>
                 <li>Refresh this page after starting the service</li>
             </ol>
             <p>

@@ -16,7 +16,7 @@ const clearBtn = document.getElementById('clearBtn');
 // Load saved settings
 const loadSettings = () => {
     const settings = OneLife.Storage.get('settings', {
-        gradientParallaxUrl: 'http://localhost:5000',
+        gradientParallaxUrl: 'http://localhost:3001',
         model: 'llama-3.1-8b-instruct',
         temperature: 0.7,
         maxTokens: 1000,
@@ -38,7 +38,7 @@ const loadSettings = () => {
 // Save settings
 const saveSettings = () => {
     const settings = {
-        gradientParallaxUrl: gradientParallaxUrl ? gradientParallaxUrl.value : 'http://localhost:5000',
+        gradientParallaxUrl: gradientParallaxUrl ? gradientParallaxUrl.value : 'http://localhost:3001',
         model: modelSelect ? modelSelect.value : 'llama-3.1-8b-instruct',
         temperature: temperatureSlider ? parseFloat(temperatureSlider.value) : 0.7,
         maxTokens: maxTokens ? parseInt(maxTokens.value) : 1000,
@@ -56,7 +56,7 @@ const testConnection = async () => {
     connectionStatus.textContent = 'Testing connection...';
     connectionStatus.style.color = 'rgba(255, 255, 255, 0.6)';
     
-    const url = gradientParallaxUrl.value || 'http://localhost:5000';
+    const url = gradientParallaxUrl.value || 'http://localhost:3001';
     const healthUrl = `${url}/health`;
     
     try {
