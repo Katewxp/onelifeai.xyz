@@ -5,6 +5,17 @@ const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendButton = document.getElementById('sendButton');
 const chatStatus = document.getElementById('chatStatus');
+const showReasoningToggle = document.getElementById('showReasoningToggle');
+
+// Get preference for showing reasoning
+const shouldShowReasoning = () => {
+    return OneLife.Storage.get('showReasoning', false);
+};
+
+// Save preference
+const saveReasoningPreference = (show) => {
+    OneLife.Storage.set('showReasoning', show);
+};
 
 // Gradient Parallax configuration
 const GRADIENT_PARALLAX_CONFIG = {
@@ -230,14 +241,53 @@ Example good response: "Got it! I've recorded your $35 lunch expense in the Food
         return 'Sorry, I could not generate a response. The API returned an unexpected format.';
     }
     
-    // Filter out reasoning tags (like <think>...</think> or <think>...</think>)
-    content = content.replace(/<think>[\s\S]*?<\/redacted_reasoning>/gi, '');
-    content = content.replace(/<think>/gi, '');
-    content = content.replace(/<think>[\s\S]*?<\/think>/gi, '');
-    content = content.replace(/<think>/gi, '');
-    content = content.trim();
+    // Extract reasoning and main content
+    const reasoningMatch = content.match(/<think>([\s\S]*?)<\/redacted_reasoning>/i) || 
+                          content.match(/<think>([\s\S]*?)<\/think>/i);
     
-    return content || 'Sorry, I could not generate a response.';
+    let reasoning = null;
+    let mainContent = content;
+    
+    if (reasoningMatch) {
+        reasoning = reasoningMatch[1].trim();
+        // Remove reasoning from main content
+        mainContent = content.replace(/<think>[\s\S]*?<\/redacted_reasoning>/gi, '')
+                            .replace(/<think>[\s\S]*?<\/think>/gi, '')
+                            .replace(/<think>/gi, '')
+                            .trim();
+    } else {
+        // Try to find reasoning patterns without tags
+        // Some models output reasoning before the main response
+        const lines = content.split('\n');
+        const reasoningLines = [];
+        const mainLines = [];
+        let foundMain = false;
+        
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed && !foundMain && (
+                trimmed.toLowerCase().startsWith('okay') ||
+                trimmed.toLowerCase().startsWith('the user') ||
+                trimmed.toLowerCase().startsWith('i need') ||
+                trimmed.toLowerCase().startsWith('so, i should')
+            )) {
+                reasoningLines.push(line);
+            } else {
+                foundMain = true;
+                mainLines.push(line);
+            }
+        }
+        
+        if (reasoningLines.length > 0 && mainLines.length > 0) {
+            reasoning = reasoningLines.join('\n').trim();
+            mainContent = mainLines.join('\n').trim();
+        }
+    }
+    
+    return {
+        content: mainContent || content.trim() || 'Sorry, I could not generate a response.',
+        reasoning: reasoning
+    };
 };
 
 // Process message with local AI and data extraction
@@ -246,10 +296,13 @@ const processMessage = async (message) => {
     
     // Try to call Gradient Parallax first
     let aiResponse = '';
+    let aiReasoning = null;
     if (isServiceAvailable) {
         try {
             updateStatus('AI is thinking...', 'checking');
-            aiResponse = await callGradientParallax(message);
+            const response = await callGradientParallax(message);
+            aiResponse = response.content;
+            aiReasoning = response.reasoning;
             updateStatus('Connected to Gradient Parallax', 'connected');
         } catch (error) {
             console.error('Gradient Parallax error:', error);
@@ -339,7 +392,7 @@ const detectMood = (message) => {
     return 'Neutral';
 };
 
-const addMessage = (text, isUser = false) => {
+const addMessage = (text, isUser = false, reasoning = null) => {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${isUser ? 'user-message' : 'ai-message'}`;
     
@@ -359,7 +412,20 @@ const addMessage = (text, isUser = false) => {
         return `<p>${line}</p>`;
     }).join('');
     
-    content.innerHTML = formattedText;
+    // Add reasoning if available and user wants to see it
+    let fullContent = formattedText;
+    if (reasoning && shouldShowReasoning()) {
+        const reasoningDiv = document.createElement('div');
+        reasoningDiv.className = 'message-reasoning';
+        reasoningDiv.innerHTML = `
+            <div class="reasoning-header">💭 AI Reasoning Process</div>
+            <div class="reasoning-content">${reasoning.split('\n').map(line => `<p>${line}</p>`).join('')}</div>
+        `;
+        content.innerHTML = formattedText;
+        content.appendChild(reasoningDiv);
+    } else {
+        content.innerHTML = formattedText;
+    }
     
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);
@@ -416,7 +482,7 @@ const sendMessage = async () => {
     try {
         const response = await processMessage(message);
         hideTyping();
-        addMessage(response.text, false);
+        addMessage(response.text, false, response.reasoning);
         
         // Show confirmation if data was recorded
         if (response.structuredData) {
@@ -446,6 +512,22 @@ chatInput.addEventListener('keypress', (e) => {
         sendMessage();
     }
 });
+
+// Initialize reasoning toggle
+if (showReasoningToggle) {
+    showReasoningToggle.checked = shouldShowReasoning();
+    showReasoningToggle.addEventListener('change', (e) => {
+        saveReasoningPreference(e.target.checked);
+        // Re-render messages with new preference
+        const messages = chatMessages.querySelectorAll('.ai-message');
+        messages.forEach(msg => {
+            const reasoningDiv = msg.querySelector('.message-reasoning');
+            if (reasoningDiv) {
+                reasoningDiv.style.display = e.target.checked ? 'block' : 'none';
+            }
+        });
+    });
+}
 
 // Initialize on load
 window.addEventListener('load', () => {

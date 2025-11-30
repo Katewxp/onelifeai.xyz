@@ -148,6 +148,34 @@
     transform: scale(0.95);
 }
 
+.chat-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.show-reasoning-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    user-select: none;
+}
+
+.show-reasoning-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.show-reasoning-toggle:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
 .chat-status {
     display: flex;
     align-items: center;
@@ -229,6 +257,33 @@
 
 .warning-content a:hover {
     text-decoration: underline;
+}
+
+/* Reasoning display styles */
+.message-reasoning {
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid rgba(102, 126, 234, 0.5);
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.reasoning-header {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.reasoning-content {
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.reasoning-content p {
+    margin: 4px 0;
 }
 
 .typing-indicator {
