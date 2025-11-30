@@ -44,15 +44,20 @@
                 <div class="settings-section">
                     <h2 class="section-title">🤖 Gradient Parallax AI</h2>
                     <div class="setting-item">
-                        <label>Service URL</label>
+                        <label>API Endpoint URL</label>
                         <input type="text" class="setting-input" id="gradientParallaxUrl" placeholder="http://localhost:3001">
-                        <p class="setting-description">The URL where your Gradient Parallax service is running. Default: http://localhost:3001</p>
+                        <p class="setting-description">Your Gradient Parallax API endpoint (e.g., http://localhost:3001). The API path /v1/chat/completions will be appended automatically.</p>
+                    </div>
+                    <div class="setting-item">
+                        <label>API Key (Optional)</label>
+                        <input type="password" class="setting-input" id="apiKey" placeholder="Leave empty for local models">
+                        <p class="setting-description">API key (optional for local models, required for remote APIs)</p>
                     </div>
                     <div class="setting-item">
                         <label>AI Model</label>
                         <select class="setting-input" id="modelSelect">
                             <optgroup label="Qwen Models (Small)">
-                                <option value="Qwen/Qwen3-0.6B">Qwen3-0.6B (2GB VRAM)</option>
+                                <option value="Qwen/Qwen3-0.6B" selected>Qwen3-0.6B (2GB VRAM)</option>
                                 <option value="Qwen/Qwen3-0.6B-FP8">Qwen3-0.6B-FP8 (2GB VRAM)</option>
                                 <option value="Qwen/Qwen3-1.7B">Qwen3-1.7B (5GB VRAM)</option>
                                 <option value="Qwen/Qwen3-1.7B-FP8">Qwen3-1.7B-FP8 (3GB VRAM)</option>
@@ -129,8 +134,8 @@
                     </div>
                     <div class="setting-item">
                         <label>Max Tokens</label>
-                        <input type="number" class="setting-input" id="maxTokens" min="100" max="4000" step="100" value="1000">
-                        <p class="setting-description">Maximum number of tokens in the response. Higher values allow longer responses.</p>
+                        <input type="number" class="setting-input" id="maxTokens" min="100" max="8192" step="100" value="2048">
+                        <p class="setting-description">Maximum number of tokens in the response. Default: 2048. Higher values allow longer responses.</p>
                     </div>
                     <div class="setting-item">
                         <button class="btn-secondary" id="testConnectionBtn">Test Connection</button>

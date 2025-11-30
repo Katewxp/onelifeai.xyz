@@ -1,5 +1,6 @@
 // Settings page functionality
 const gradientParallaxUrl = document.getElementById('gradientParallaxUrl');
+const apiKey = document.getElementById('apiKey');
 const modelSelect = document.getElementById('modelSelect');
 const temperatureSlider = document.getElementById('temperatureSlider');
 const temperatureValue = document.getElementById('temperatureValue');
@@ -17,31 +18,34 @@ const clearBtn = document.getElementById('clearBtn');
 const loadSettings = () => {
     const settings = OneLife.Storage.get('settings', {
         gradientParallaxUrl: 'http://localhost:3001',
-        model: 'Qwen/Qwen3-4B-Instruct-2507-FP8',
+        model: 'Qwen/Qwen3-0.6B',
+        apiKey: '',
         temperature: 0.7,
-        maxTokens: 1000,
+        maxTokens: 2048,
         encryption: true,
         notifications: false
     });
     
-    if (gradientParallaxUrl) gradientParallaxUrl.value = settings.gradientParallaxUrl;
-    if (modelSelect) modelSelect.value = settings.model;
+    if (gradientParallaxUrl) gradientParallaxUrl.value = settings.gradientParallaxUrl || 'http://localhost:3001';
+    if (apiKey) apiKey.value = settings.apiKey || '';
+    if (modelSelect) modelSelect.value = settings.model || 'Qwen/Qwen3-0.6B';
     if (temperatureSlider) {
-        temperatureSlider.value = settings.temperature;
-        if (temperatureValue) temperatureValue.textContent = settings.temperature;
+        temperatureSlider.value = settings.temperature || 0.7;
+        if (temperatureValue) temperatureValue.textContent = settings.temperature || 0.7;
     }
-    if (maxTokens) maxTokens.value = settings.maxTokens;
-    if (encryptionToggle) encryptionToggle.checked = settings.encryption;
-    if (notificationsToggle) notificationsToggle.checked = settings.notifications;
+    if (maxTokens) maxTokens.value = settings.maxTokens || 2048;
+    if (encryptionToggle) encryptionToggle.checked = settings.encryption !== false;
+    if (notificationsToggle) notificationsToggle.checked = settings.notifications === true;
 };
 
 // Save settings
 const saveSettings = () => {
     const settings = {
         gradientParallaxUrl: gradientParallaxUrl ? gradientParallaxUrl.value : 'http://localhost:3001',
-        model: modelSelect ? modelSelect.value : 'Qwen/Qwen3-4B-Instruct-2507-FP8',
+        model: modelSelect ? modelSelect.value : 'Qwen/Qwen3-0.6B',
+        apiKey: document.getElementById('apiKey') ? document.getElementById('apiKey').value : '',
         temperature: temperatureSlider ? parseFloat(temperatureSlider.value) : 0.7,
-        maxTokens: maxTokens ? parseInt(maxTokens.value) : 1000,
+        maxTokens: maxTokens ? parseInt(maxTokens.value) : 2048,
         encryption: encryptionToggle ? encryptionToggle.checked : true,
         notifications: notificationsToggle ? notificationsToggle.checked : false
     };
@@ -56,24 +60,62 @@ const testConnection = async () => {
     connectionStatus.textContent = 'Testing connection...';
     connectionStatus.style.color = 'rgba(255, 255, 255, 0.6)';
     
-    const url = gradientParallaxUrl.value || 'http://localhost:3001';
-    const healthUrl = `${url}/health`;
+    const url = gradientParallaxUrl ? gradientParallaxUrl.value.trim() : 'http://localhost:3001';
+    const model = modelSelect ? modelSelect.value : 'Qwen/Qwen3-0.6B';
+    const apiKey = document.getElementById('apiKey') ? document.getElementById('apiKey').value.trim() : '';
+    const apiUrl = `${url}/v1/chat/completions`;
+    
+    if (!url) {
+        connectionStatus.textContent = '❌ Please enter API endpoint URL';
+        connectionStatus.style.color = '#f5576c';
+        testConnectionBtn.disabled = false;
+        return;
+    }
+    
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    
+    if (apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+    }
     
     try {
-        const response = await fetch(healthUrl, {
-            method: 'GET',
-            mode: 'cors',
-            signal: AbortSignal.timeout(5000)
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                model: model,
+                messages: [
+                    { role: 'user', content: 'Hello' }
+                ],
+                max_tokens: 10,
+                stream: false
+            }),
+            signal: AbortSignal.timeout(10000)
         });
         
         if (response.ok) {
-            connectionStatus.textContent = '✅ Connected successfully!';
-            connectionStatus.style.color = '#38ef7d';
+            const data = await response.json();
+            if (data.choices && data.choices[0]) {
+                connectionStatus.textContent = '✅ Connection successful!';
+                connectionStatus.style.color = '#38ef7d';
+            } else {
+                throw new Error('Unexpected response format');
+            }
         } else {
-            throw new Error('Service returned error');
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
     } catch (error) {
-        connectionStatus.textContent = '❌ Connection failed. Please ensure Gradient Parallax is running.';
+        console.error('Connection test error:', error);
+        let errorMsg = '❌ Connection failed. ';
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            errorMsg += 'Please ensure Gradient Parallax is running at ' + url;
+        } else {
+            errorMsg += error.message;
+        }
+        connectionStatus.textContent = errorMsg;
         connectionStatus.style.color = '#f5576c';
     } finally {
         testConnectionBtn.disabled = false;
@@ -84,6 +126,10 @@ const testConnection = async () => {
 if (gradientParallaxUrl) {
     gradientParallaxUrl.addEventListener('change', saveSettings);
     gradientParallaxUrl.addEventListener('blur', saveSettings);
+}
+if (apiKey) {
+    apiKey.addEventListener('change', saveSettings);
+    apiKey.addEventListener('blur', saveSettings);
 }
 if (modelSelect) modelSelect.addEventListener('change', saveSettings);
 if (temperatureSlider) {

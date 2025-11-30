@@ -9,7 +9,7 @@ const chatStatus = document.getElementById('chatStatus');
 // Gradient Parallax configuration
 const GRADIENT_PARALLAX_CONFIG = {
     baseUrl: 'http://localhost:3001', // Default Gradient Parallax local server
-    apiEndpoint: '/api/v1/chat/completions',
+    apiEndpoint: '/v1/chat/completions', // Note: /v1/chat/completions (not /api/v1/chat/completions)
     timeout: 30000
 };
 
@@ -17,22 +17,33 @@ const GRADIENT_PARALLAX_CONFIG = {
 const getSettings = () => {
     return OneLife.Storage.get('settings', {
         gradientParallaxUrl: 'http://localhost:3001',
-        model: 'Qwen/Qwen3-4B-Instruct-2507-FP8',
+        model: 'Qwen/Qwen3-0.6B',
         temperature: 0.7,
-        maxTokens: 1000
+        maxTokens: 2048
     });
 };
 
 // Check if Gradient Parallax service is running
 const checkGradientParallaxStatus = async () => {
     const settings = getSettings();
-    const statusUrl = `${settings.gradientParallaxUrl}/health`;
+    // Test with a simple API call instead of health endpoint
+    const apiUrl = `${settings.gradientParallaxUrl}/v1/chat/completions`;
     
     try {
-        const response = await fetch(statusUrl, {
-            method: 'GET',
-            mode: 'cors',
-            signal: AbortSignal.timeout(3000)
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: settings.model || 'Qwen/Qwen3-0.6B',
+                messages: [
+                    { role: 'user', content: 'Hello' }
+                ],
+                max_tokens: 10,
+                stream: false
+            }),
+            signal: AbortSignal.timeout(5000)
         });
         return response.ok;
     } catch (error) {
@@ -130,37 +141,53 @@ const updateStatus = (text, status) => {
 // Call Gradient Parallax API
 const callGradientParallax = async (message) => {
     const settings = getSettings();
-    const apiUrl = `${settings.gradientParallaxUrl}${GRADIENT_PARALLAX_CONFIG.apiEndpoint}`;
+    const apiUrl = `${settings.gradientParallaxUrl}/v1/chat/completions`;
+    
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    
+    // Add API key if provided (optional for local models)
+    if (settings.apiKey && settings.apiKey.trim()) {
+        headers['Authorization'] = `Bearer ${settings.apiKey}`;
+    }
+    
+    const requestBody = {
+        model: settings.model || 'Qwen/Qwen3-0.6B',
+        messages: [
+            {
+                role: 'system',
+                content: 'You are a helpful local AI assistant for OneLife, a privacy-first life management app. Help users record expenses, manage tasks, track moods, and organize their life data. Always be concise and helpful.'
+            },
+            {
+                role: 'user',
+                content: message
+            }
+        ],
+        temperature: settings.temperature || 0.7,
+        max_tokens: settings.maxTokens || 2048,
+        stream: false // Use non-streaming for simplicity
+    };
+    
+    console.log('Calling Gradient Parallax API:', apiUrl);
+    console.log('Request body:', requestBody);
     
     const response = await fetch(apiUrl, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            model: settings.model,
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are a helpful local AI assistant for OneLife, a privacy-first life management app. Help users record expenses, manage tasks, track moods, and organize their life data. Always be concise and helpful.'
-                },
-                {
-                    role: 'user',
-                    content: message
-                }
-            ],
-            temperature: settings.temperature,
-            max_tokens: settings.maxTokens,
-            stream: false
-        })
+        headers: headers,
+        body: JSON.stringify(requestBody)
     });
     
     if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error(`API error: ${response.status} - ${errorText}`);
     }
     
     const data = await response.json();
-    return data.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
+    console.log('API Response:', data);
+    
+    return data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
 };
 
 // Process message with local AI and data extraction
