@@ -17,7 +17,7 @@ const GRADIENT_PARALLAX_CONFIG = {
 const getSettings = () => {
     return OneLife.Storage.get('settings', {
         gradientParallaxUrl: 'http://localhost:3001',
-        model: 'llama-3.1-8b-instruct',
+        model: 'Qwen/Qwen3-4B-Instruct-2507-FP8',
         temperature: 0.7,
         maxTokens: 1000
     });

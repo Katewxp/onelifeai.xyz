@@ -17,7 +17,7 @@ const clearBtn = document.getElementById('clearBtn');
 const loadSettings = () => {
     const settings = OneLife.Storage.get('settings', {
         gradientParallaxUrl: 'http://localhost:3001',
-        model: 'llama-3.1-8b-instruct',
+        model: 'Qwen/Qwen3-4B-Instruct-2507-FP8',
         temperature: 0.7,
         maxTokens: 1000,
         encryption: true,
@@ -39,7 +39,7 @@ const loadSettings = () => {
 const saveSettings = () => {
     const settings = {
         gradientParallaxUrl: gradientParallaxUrl ? gradientParallaxUrl.value : 'http://localhost:3001',
-        model: modelSelect ? modelSelect.value : 'llama-3.1-8b-instruct',
+        model: modelSelect ? modelSelect.value : 'Qwen/Qwen3-4B-Instruct-2507-FP8',
         temperature: temperatureSlider ? parseFloat(temperatureSlider.value) : 0.7,
         maxTokens: maxTokens ? parseInt(maxTokens.value) : 1000,
         encryption: encryptionToggle ? encryptionToggle.checked : true,

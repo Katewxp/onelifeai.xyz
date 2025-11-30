@@ -51,15 +51,75 @@
                     <div class="setting-item">
                         <label>AI Model</label>
                         <select class="setting-input" id="modelSelect">
-                            <option value="llama-3.1-8b-instruct">Llama 3.1 8B Instruct</option>
-                            <option value="llama-3.1-70b-instruct">Llama 3.1 70B Instruct</option>
-                            <option value="mistral-7b-instruct">Mistral 7B Instruct</option>
-                            <option value="mixtral-8x7b-instruct">Mixtral 8x7B Instruct</option>
-                            <option value="phi-3-mini">Phi-3 Mini</option>
-                            <option value="phi-3-medium">Phi-3 Medium</option>
-                            <option value="gemma-7b-it">Gemma 7B IT</option>
+                            <optgroup label="Qwen Models (Small)">
+                                <option value="Qwen/Qwen3-0.6B">Qwen3-0.6B (2GB VRAM)</option>
+                                <option value="Qwen/Qwen3-0.6B-FP8">Qwen3-0.6B-FP8 (2GB VRAM)</option>
+                                <option value="Qwen/Qwen3-1.7B">Qwen3-1.7B (5GB VRAM)</option>
+                                <option value="Qwen/Qwen3-1.7B-FP8">Qwen3-1.7B-FP8 (3GB VRAM)</option>
+                                <option value="Qwen/Qwen3-4B">Qwen3-4B (12GB VRAM)</option>
+                                <option value="Qwen/Qwen3-4B-FP8">Qwen3-4B-FP8 (7GB VRAM)</option>
+                                <option value="Qwen/Qwen3-4B-Instruct-2507">Qwen3-4B-Instruct-2507 (12GB VRAM)</option>
+                                <option value="Qwen/Qwen3-4B-Instruct-2507-FP8">Qwen3-4B-Instruct-2507-FP8 (7GB VRAM)</option>
+                                <option value="Qwen/Qwen3-4B-Thinking-2507">Qwen3-4B-Thinking-2507 (12GB VRAM)</option>
+                                <option value="Qwen/Qwen3-4B-Thinking-2507-FP8">Qwen3-4B-Thinking-2507-FP8 (7GB VRAM)</option>
+                            </optgroup>
+                            <optgroup label="Qwen Models (Medium)">
+                                <option value="Qwen/Qwen3-8B">Qwen3-8B (22GB VRAM)</option>
+                                <option value="Qwen/Qwen3-8B-FP8">Qwen3-8B-FP8 (12GB VRAM)</option>
+                                <option value="Qwen/Qwen3-14B">Qwen3-14B (41GB VRAM)</option>
+                                <option value="Qwen/Qwen3-14B-FP8">Qwen3-14B-FP8 (22GB VRAM)</option>
+                                <option value="Qwen/Qwen2.5-0.5B-Instruct">Qwen2.5-0.5B-Instruct (2GB VRAM)</option>
+                                <option value="Qwen/Qwen2.5-1.5B-Instruct">Qwen2.5-1.5B-Instruct (5GB VRAM)</option>
+                                <option value="Qwen/Qwen2.5-3B-Instruct">Qwen2.5-3B-Instruct (9GB VRAM)</option>
+                                <option value="Qwen/Qwen2.5-7B-Instruct">Qwen2.5-7B-Instruct (21GB VRAM)</option>
+                                <option value="Qwen/Qwen2.5-14B-Instruct">Qwen2.5-14B-Instruct (41GB VRAM)</option>
+                            </optgroup>
+                            <optgroup label="Qwen Models (Large)">
+                                <option value="Qwen/Qwen3-32B">Qwen3-32B (92GB VRAM)</option>
+                                <option value="Qwen/Qwen3-32B-FP8">Qwen3-32B-FP8 (47GB VRAM)</option>
+                                <option value="Qwen/Qwen3-30B-A3B">Qwen3-30B-A3B (87GB VRAM)</option>
+                                <option value="Qwen/Qwen3-30B-A3B-Instruct-2507-FP8">Qwen3-30B-A3B-Instruct-2507-FP8 (44GB VRAM)</option>
+                                <option value="Qwen/Qwen3-30B-A3B-Thinking-2507-FP8">Qwen3-30B-A3B-Thinking-2507-FP8 (44GB VRAM)</option>
+                                <option value="Qwen/Qwen2.5-32B-Instruct">Qwen2.5-32B-Instruct (92GB VRAM)</option>
+                                <option value="Qwen/Qwen2.5-72B-Instruct">Qwen2.5-72B-Instruct (205GB VRAM)</option>
+                            </optgroup>
+                            <optgroup label="Qwen Models (Extra Large)">
+                                <option value="Qwen/Qwen3-Next-80B-A3B-Instruct">Qwen3-Next-80B-A3B-Instruct (226GB VRAM)</option>
+                                <option value="Qwen/Qwen3-Next-80B-A3B-Instruct-FP8">Qwen3-Next-80B-A3B-Instruct-FP8 (113GB VRAM)</option>
+                                <option value="Qwen/Qwen3-Next-80B-A3B-Thinking">Qwen3-Next-80B-A3B-Thinking (226GB VRAM)</option>
+                                <option value="Qwen/Qwen3-Next-80B-A3B-Thinking-FP8">Qwen3-Next-80B-A3B-Thinking-FP8 (113GB VRAM)</option>
+                                <option value="Qwen/Qwen3-235B-A22B-Instruct-2507-FP8">Qwen3-235B-A22B-Instruct-2507-FP8 (337GB VRAM)</option>
+                                <option value="Qwen/Qwen3-235B-A22B-Thinking-2507-FP8">Qwen3-235B-A22B-Thinking-2507-FP8 (337GB VRAM)</option>
+                                <option value="Qwen/Qwen3-235B-A22B-GPTQ-Int4">Qwen3-235B-A22B-GPTQ-Int4 (170GB VRAM)</option>
+                            </optgroup>
+                            <optgroup label="OpenAI Models">
+                                <option value="openai/gpt-oss-20b">GPT-OSS-20B (16GB VRAM)</option>
+                                <option value="openai/gpt-oss-120b">GPT-OSS-120B (85GB VRAM)</option>
+                                <option value="openai/gpt-oss-safeguard-20b">GPT-OSS-Safeguard-20B (16GB VRAM)</option>
+                                <option value="openai/gpt-oss-safeguard-120b">GPT-OSS-Safeguard-120B (85GB VRAM)</option>
+                            </optgroup>
+                            <optgroup label="NVIDIA Llama Models">
+                                <option value="nvidia/Llama-3.1-8B-Instruct-FP8">Llama-3.1-8B-Instruct-FP8 (22GB VRAM)</option>
+                                <option value="nvidia/Llama-3.1-70B-Instruct-FP8">Llama-3.1-70B-Instruct-FP8 (200GB VRAM)</option>
+                                <option value="nvidia/Llama-3.3-70B-Instruct-FP8">Llama-3.3-70B-Instruct-FP8 (200GB VRAM)</option>
+                            </optgroup>
+                            <optgroup label="Moonshot AI Models">
+                                <option value="moonshotai/Kimi-K2-Instruct">Kimi-K2-Instruct (1505GB VRAM)</option>
+                                <option value="moonshotai/Kimi-K2-Instruct-0905">Kimi-K2-Instruct-0905 (1505GB VRAM)</option>
+                                <option value="moonshotai/Kimi-K2-Thinking">Kimi-K2-Thinking (754GB VRAM)</option>
+                            </optgroup>
+                            <optgroup label="DeepSeek Models">
+                                <option value="deepseek-ai/DeepSeek-V2">DeepSeek-V2 (716GB VRAM)</option>
+                                <option value="deepseek-ai/DeepSeek-V3">DeepSeek-V3 (1035GB VRAM)</option>
+                                <option value="deepseek-ai/DeepSeek-V3.1">DeepSeek-V3.1 (1035GB VRAM)</option>
+                                <option value="deepseek-ai/DeepSeek-R1">DeepSeek-R1 (1035GB VRAM)</option>
+                            </optgroup>
+                            <optgroup label="Other Models">
+                                <option value="MiniMaxAI/MiniMax-M2">MiniMax-M2 (328GB VRAM)</option>
+                                <option value="zai-org/GLM-4.6">GLM-4.6 (1034GB VRAM)</option>
+                            </optgroup>
                         </select>
-                        <p class="setting-description">Choose your Gradient Parallax AI model. Make sure the model is available in your Gradient Parallax installation.</p>
+                        <p class="setting-description">Choose your Gradient Parallax AI model. Make sure the model is available in your Gradient Parallax installation. VRAM requirements are shown in parentheses.</p>
                     </div>
                     <div class="setting-item">
                         <label>Temperature</label>
