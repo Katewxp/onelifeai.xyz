@@ -242,6 +242,7 @@ Example good response: "Got it! I've recorded your $35 lunch expense in the Food
     }
     
     // Extract reasoning and main content
+    // Try to match reasoning tags first
     const reasoningMatch = content.match(/<think>([\s\S]*?)<\/redacted_reasoning>/i) || 
                           content.match(/<think>([\s\S]*?)<\/think>/i);
     
@@ -265,14 +266,18 @@ Example good response: "Got it! I've recorded your $35 lunch expense in the Food
         
         for (const line of lines) {
             const trimmed = line.trim();
+            const lowerTrimmed = trimmed.toLowerCase();
             if (trimmed && !foundMain && (
-                trimmed.toLowerCase().startsWith('okay') ||
-                trimmed.toLowerCase().startsWith('the user') ||
-                trimmed.toLowerCase().startsWith('i need') ||
-                trimmed.toLowerCase().startsWith('so, i should')
+                lowerTrimmed.startsWith('okay') ||
+                lowerTrimmed.startsWith('the user') ||
+                lowerTrimmed.startsWith('i need') ||
+                lowerTrimmed.startsWith('so, i should') ||
+                lowerTrimmed.startsWith('let me') ||
+                lowerTrimmed.startsWith('maybe') ||
+                (lowerTrimmed.includes('user mentioned') && lowerTrimmed.includes('spent'))
             )) {
                 reasoningLines.push(line);
-            } else {
+            } else if (trimmed) {
                 foundMain = true;
                 mainLines.push(line);
             }
@@ -368,6 +373,7 @@ const processMessage = async (message) => {
     
     return {
         text: aiResponse,
+        reasoning: aiReasoning,
         structuredData: structuredData
     };
 };
