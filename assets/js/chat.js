@@ -153,12 +153,29 @@ const callGradientParallax = async (message) => {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
     }
     
+    // Build context-aware system prompt
+    const systemPrompt = `You are a helpful local AI assistant for OneLife, a privacy-first life management app.
+
+Your main tasks:
+1. Help users record and organize their life data (expenses, tasks, moods, health, notes)
+2. Answer questions about their data
+3. Provide insights and summaries
+4. Help plan schedules
+
+When users mention expenses (e.g., "I spent $X on Y"), acknowledge it naturally and confirm it's been recorded.
+When users mention tasks or reminders, acknowledge and confirm it's been added to their calendar.
+When users mention moods or feelings, acknowledge empathetically and confirm it's been logged.
+When users mention health data (steps, exercise, sleep, etc.), acknowledge and confirm it's been tracked.
+
+Keep responses concise, friendly, and helpful. Always confirm when data has been recorded.
+Do NOT include reasoning tags or thinking process in your response - just provide the direct, helpful response.`;
+
     const requestBody = {
         model: settings.model || 'Qwen/Qwen3-0.6B',
         messages: [
             {
                 role: 'system',
-                content: 'You are a helpful local AI assistant for OneLife, a privacy-first life management app. Help users record expenses, manage tasks, track moods, and organize their life data. Always be concise and helpful.'
+                content: systemPrompt
             },
             {
                 role: 'user',
@@ -188,7 +205,33 @@ const callGradientParallax = async (message) => {
     const data = await response.json();
     console.log('API Response:', data);
     
-    return data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
+    // Handle different response formats
+    let content = null;
+    
+    // Try standard format: choices[0].message.content
+    if (data.choices?.[0]?.message?.content) {
+        content = data.choices[0].message.content;
+    }
+    // Try alternative format: choices[0].messages.content
+    else if (data.choices?.[0]?.messages?.content) {
+        content = data.choices[0].messages.content;
+    }
+    // Try direct messages format
+    else if (data.messages?.[0]?.content) {
+        content = data.messages[0].content;
+    }
+    
+    if (!content) {
+        console.error('Unexpected API response format:', data);
+        return 'Sorry, I could not generate a response. The API returned an unexpected format.';
+    }
+    
+    // Filter out reasoning tags (like <think>...</think>)
+    content = content.replace(/<think>[\s\S]*?<\/redacted_reasoning>/gi, '');
+    content = content.replace(/<think>/gi, '');
+    content = content.trim();
+    
+    return content || 'Sorry, I could not generate a response.';
 };
 
 // Process message with local AI and data extraction
