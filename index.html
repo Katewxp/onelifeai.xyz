@@ -162,11 +162,63 @@
     <!-- AI Chat Preview -->
     <section class="chat-preview">
         <div class="container">
-            <div class="chat-bubble chat-user">
-                "I spent $35 on lunch today"
+            <div class="chat-examples" id="chatExamples">
+                <!-- Example 1 -->
+                <div class="chat-example active">
+                    <div class="chat-bubble chat-user">
+                        "I spent $35 on lunch today"
+                    </div>
+                    <div class="chat-bubble chat-ai">
+                        Auto-recognized → Expense recorded → Category: Food & Dining → Added to your monthly report
+                    </div>
+                </div>
+                
+                <!-- Example 2 -->
+                <div class="chat-example">
+                    <div class="chat-bubble chat-user">
+                        "Remind me to call John tomorrow"
+                    </div>
+                    <div class="chat-bubble chat-ai">
+                        Task created → Scheduled for tomorrow → Added to your calendar
+                    </div>
+                </div>
+                
+                <!-- Example 3 -->
+                <div class="chat-example">
+                    <div class="chat-bubble chat-user">
+                        "I feel happy today"
+                    </div>
+                    <div class="chat-bubble chat-ai">
+                        Mood logged → Happy → Tracked in your mood journal
+                    </div>
+                </div>
+                
+                <!-- Example 4 -->
+                <div class="chat-example">
+                    <div class="chat-bubble chat-user">
+                        "Show me my expenses this month"
+                    </div>
+                    <div class="chat-bubble chat-ai">
+                        Analyzing your data → Total: $450 → Food: $200, Transport: $150, Other: $100
+                    </div>
+                </div>
+                
+                <!-- Example 5 -->
+                <div class="chat-example">
+                    <div class="chat-bubble chat-user">
+                        "I walked 10,000 steps today"
+                    </div>
+                    <div class="chat-bubble chat-ai">
+                        Health data recorded → Steps: 10,000 → Great job! Keep it up!
+                    </div>
+                </div>
             </div>
-            <div class="chat-bubble chat-ai">
-                Auto-recognized → Expense recorded → Category: Food & Dining → Added to your monthly report
+            <div class="chat-indicators">
+                <span class="indicator active" data-index="0"></span>
+                <span class="indicator" data-index="1"></span>
+                <span class="indicator" data-index="2"></span>
+                <span class="indicator" data-index="3"></span>
+                <span class="indicator" data-index="4"></span>
             </div>
         </div>
     </section>
@@ -403,6 +455,64 @@
     </footer>
 
     <script src="/assets/js/main.js"></script>
+    <script>
+        // Chat examples carousel
+        (function() {
+            const examples = document.querySelectorAll('.chat-example');
+            const indicators = document.querySelectorAll('.indicator');
+            let currentIndex = 0;
+            let intervalId = null;
+
+            function showExample(index) {
+                // Remove active class from all
+                examples.forEach(ex => ex.classList.remove('active'));
+                indicators.forEach(ind => ind.classList.remove('active'));
+                
+                // Add active class to current
+                examples[index].classList.add('active');
+                indicators[index].classList.add('active');
+                
+                currentIndex = index;
+            }
+
+            function nextExample() {
+                const nextIndex = (currentIndex + 1) % examples.length;
+                showExample(nextIndex);
+            }
+
+            function startCarousel() {
+                intervalId = setInterval(nextExample, 4000); // Change every 4 seconds
+            }
+
+            function stopCarousel() {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            }
+
+            // Indicator click handlers
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => {
+                    stopCarousel();
+                    showExample(index);
+                    startCarousel();
+                });
+            });
+
+            // Start carousel on load
+            if (examples.length > 0) {
+                startCarousel();
+                
+                // Pause on hover
+                const chatPreview = document.querySelector('.chat-preview');
+                if (chatPreview) {
+                    chatPreview.addEventListener('mouseenter', stopCarousel);
+                    chatPreview.addEventListener('mouseleave', startCarousel);
+                }
+            }
+        })();
+    </script>
 </body>
 </html>
 
