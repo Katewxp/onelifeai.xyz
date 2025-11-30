@@ -238,7 +238,10 @@ Example good response: "Got it! I've recorded your $35 lunch expense in the Food
     
     if (!content) {
         console.error('Unexpected API response format:', data);
-        return 'Sorry, I could not generate a response. The API returned an unexpected format.';
+        return {
+            content: 'Sorry, I could not generate a response. The API returned an unexpected format.',
+            reasoning: null
+        };
     }
     
     // Extract reasoning and main content
