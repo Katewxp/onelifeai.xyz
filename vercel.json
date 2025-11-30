@@ -38,6 +38,18 @@
     {
       "source": "/settings/:path*",
       "destination": "/settings/index.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/manifesto",
+      "destination": "/manifesto.html"
     }
   ]
 }
