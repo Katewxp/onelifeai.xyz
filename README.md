@@ -1,5 +1,9 @@
 # OneLife - Your Life. One Local AI.
 
+**Website**: [https://www.onelifeai.xyz/](https://www.onelifeai.xyz/)
+
+**Demo Video**: [Watch the demo](https://www.onelifeai.xyz/onelifeai-demo.mp4)
+
 OneLife is a privacy-first, local AI life assistant that keeps all your data on your device. No cloud, no tracking, complete privacy.
 
 ## 🎯 Product Vision
