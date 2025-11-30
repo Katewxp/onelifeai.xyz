@@ -114,6 +114,16 @@ const createRecordHTML = (record) => {
     `;
 };
 
+// Map tab names to record types
+const tabToTypeMap = {
+    'all': null,
+    'expenses': 'expense',
+    'todos': 'todo',
+    'mood': 'mood',
+    'health': 'health',
+    'notes': 'note'
+};
+
 // Tab switching
 tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -124,8 +134,8 @@ tabButtons.forEach(btn => {
         // Update current tab
         currentTab = btn.dataset.tab;
         
-        // Load records
-        const type = currentTab === 'all' ? null : currentTab;
+        // Load records with correct type mapping
+        const type = tabToTypeMap[currentTab] || null;
         loadRecords(type);
     });
 });

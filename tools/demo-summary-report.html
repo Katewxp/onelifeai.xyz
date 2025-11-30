@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneLife AI Chat - Summary Report Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #ffffff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff 0%, #667eea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .demo-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+            color: #a8b5ff;
+        }
+        
+        .output .success {
+            color: #38ef7d;
+        }
+        
+        .output .error {
+            color: #f5576c;
+        }
+        
+        .output .info {
+            color: #4facfe;
+        }
+        
+        .output .warning {
+            color: #ffd93d;
+        }
+        
+        .example-queries {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .query-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .query-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .query-item::before {
+            content: '💬 ';
+            margin-right: 8px;
+        }
+        
+        .status {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .status.success {
+            background: rgba(56, 239, 125, 0.2);
+            border: 1px solid rgba(56, 239, 125, 0.5);
+            color: #38ef7d;
+            display: block;
+        }
+        
+        .status.error {
+            background: rgba(245, 87, 108, 0.2);
+            border: 1px solid rgba(245, 87, 108, 0.5);
+            color: #f5576c;
+            display: block;
+        }
+        
+        .status.info {
+            background: rgba(79, 172, 254, 0.2);
+            border: 1px solid rgba(79, 172, 254, 0.5);
+            color: #4facfe;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 OneLife AI Chat - Summary Report Demo</h1>
+        <p class="subtitle">Interactive demonstration of the summary and report generation features</p>
+        
+        <div id="status" class="status info">✅ OneLife demo ready! Click "Create Sample Data" to get started.</div>
+        
+        <div class="demo-section">
+            <h2>📝 Step 1: Create Sample Data</h2>
+            <p style="margin-bottom: 15px; color: rgba(255, 255, 255, 0.7);">
+                First, let's create some sample records (expenses, moods, todos, health data) to work with.
+            </p>
+            <button onclick="createSampleData()">Create Sample Data</button>
+            <div id="dataOutput" class="output" style="display: none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🔍 Step 2: Test Summary Queries</h2>
+            <p style="margin-bottom: 15px; color: rgba(255, 255, 255, 0.7);">
+                Try different summary queries to see how the AI Chat processes and analyzes your data.
+            </p>
+            <div class="button-group">
+                <button onclick="testQuery('Show me my expenses this month', 'Monthly expense summary')">Monthly Expenses</button>
+                <button onclick="testQuery('What did I spend today?', 'Today\'s spending')">Today's Spending</button>
+                <button onclick="testQuery('Summarize my mood this week', 'Weekly mood analysis')">Weekly Mood</button>
+                <button onclick="testQuery('Generate a report on my expenses', 'Full expense report')">Expense Report</button>
+                <button onclick="testQuery('Show me my todos', 'Todo list')">Todos</button>
+                <button onclick="testQuery('Analyze my health data', 'Health analysis')">Health Data</button>
+            </div>
+            <div id="queryOutput" class="output" style="display: none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>💬 Step 3: Example AI Chat Queries</h2>
+            <p style="margin-bottom: 15px; color: rgba(255, 255, 255, 0.7);">
+                Copy these queries and paste them into the AI Chat interface to see the full experience.
+            </p>
+            <div class="example-queries" id="exampleQueries"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🧹 Step 4: Cleanup</h2>
+            <p style="margin-bottom: 15px; color: rgba(255, 255, 255, 0.7);">
+                Remove all demo data when you're done testing.
+            </p>
+            <button onclick="cleanupData()" style="background: linear-gradient(135deg, #f5576c 0%, #c44569 100%);">Clear All Demo Data</button>
+        </div>
+    </div>
+
+    <script>
+        // Embedded OneLife functionality for standalone demo
+        const OneLife = {
+            DB: {
+                db: null,
+                init: async () => {
+                    if (OneLife.DB.db) return OneLife.DB.db;
+                    return new Promise((resolve, reject) => {
+                        const request = indexedDB.open('OneLifeDB', 1);
+                        
+                        request.onerror = () => reject(request.error);
+                        request.onsuccess = () => {
+                            OneLife.DB.db = request.result;
+                            resolve(OneLife.DB.db);
+                        };
+                        
+                        request.onupgradeneeded = (event) => {
+                            const db = event.target.result;
+                            
+                            if (!db.objectStoreNames.contains('records')) {
+                                const recordsStore = db.createObjectStore('records', { keyPath: 'id', autoIncrement: true });
+                                recordsStore.createIndex('type', 'type', { unique: false });
+                                recordsStore.createIndex('date', 'date', { unique: false });
+                            }
+                        };
+                    });
+                },
+                
+                addRecord: async (record) => {
+                    if (!OneLife.DB.db) await OneLife.DB.init();
+                    return new Promise((resolve, reject) => {
+                        const transaction = OneLife.DB.db.transaction(['records'], 'readwrite');
+                        const store = transaction.objectStore('records');
+                        const request = store.add(record);
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = () => reject(request.error);
+                    });
+                },
+                
+                getRecords: async (type = null) => {
+                    if (!OneLife.DB.db) await OneLife.DB.init();
+                    return new Promise((resolve, reject) => {
+                        const transaction = OneLife.DB.db.transaction(['records'], 'readonly');
+                        const store = transaction.objectStore('records');
+                        const request = type 
+                            ? store.index('type').getAll(type)
+                            : store.getAll();
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = () => reject(request.error);
+                    });
+                },
+                
+                deleteRecord: async (id) => {
+                    if (!OneLife.DB.db) await OneLife.DB.init();
+                    return new Promise((resolve, reject) => {
+                        const transaction = OneLife.DB.db.transaction(['records'], 'readwrite');
+                        const store = transaction.objectStore('records');
+                        const request = store.delete(id);
+                        request.onsuccess = () => resolve(true);
+                        request.onerror = () => reject(request.error);
+                    });
+                }
+            },
+            
+            Storage: {
+                set: (key, value) => {
+                    try {
+                        localStorage.setItem(key, JSON.stringify(value));
+                        return true;
+                    } catch (e) {
+                        console.error('Storage set error:', e);
+                        return false;
+                    }
+                },
+                get: (key, defaultValue = null) => {
+                    try {
+                        const item = localStorage.getItem(key);
+                        return item ? JSON.parse(item) : defaultValue;
+                    } catch (e) {
+                        console.error('Storage get error:', e);
+                        return defaultValue;
+                    }
+                }
+            }
+        };
+        
+        let OneLifeAvailable = true;
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            setTimeout(() => {
+                statusEl.className = 'status';
+            }, 5000);
+        }
+
+        async function createSampleData() {
+            if (!OneLifeAvailable) {
+                showStatus('OneLife is not available.', 'error');
+                return;
+            }
+
+            const output = document.getElementById('dataOutput');
+            output.style.display = 'block';
+            output.innerHTML = '<span class="info">Creating sample data...</span>\n';
+
+            try {
+                await OneLife.DB.init();
+
+                const sampleExpenses = [
+                    { type: 'expense', amount: 35, category: 'Food & Dining', description: 'Lunch at restaurant', date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'expense', amount: 12, category: 'Food & Dining', description: 'Coffee', date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'expense', amount: 45, category: 'Food & Dining', description: 'Dinner', date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'expense', amount: 25, category: 'Transportation', description: 'Uber ride', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'expense', amount: 80, category: 'Shopping', description: 'Online purchase', date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'expense', amount: 15, category: 'Food & Dining', description: 'Breakfast', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'expense', amount: 120, category: 'Bills & Utilities', description: 'Electricity bill', date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'expense', amount: 30, category: 'Entertainment', description: 'Movie tickets', date: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString() },
+                ];
+
+                const sampleMoods = [
+                    { type: 'mood', mood: 'Happy', description: 'Feeling great today!', date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'mood', mood: 'Calm', description: 'Peaceful morning', date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'mood', mood: 'Happy', description: 'Had a good day', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'mood', mood: 'Tired', description: 'Long day at work', date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'mood', mood: 'Stressed', description: 'Too much to do', date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'mood', mood: 'Happy', description: 'Weekend vibes', date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
+                ];
+
+                const sampleTodos = [
+                    { type: 'todo', description: 'Call dentist', completed: false, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'todo', description: 'Buy groceries', completed: true, date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'todo', description: 'Finish project', completed: false, date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'todo', description: 'Exercise', completed: true, date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+                ];
+
+                const sampleHealth = [
+                    { type: 'health', description: 'Walked 10,000 steps', date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'health', description: 'Drank 8 glasses of water', date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'health', description: 'Ran 5km', date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+                    { type: 'health', description: 'Slept 7 hours', date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+                ];
+
+                let count = 0;
+                for (const record of [...sampleExpenses, ...sampleMoods, ...sampleTodos, ...sampleHealth]) {
+                    await OneLife.DB.addRecord(record);
+                    count++;
+                }
+
+                output.innerHTML = `<span class="success">✅ Successfully created ${count} sample records!</span>\n\n`;
+                output.innerHTML += `<span class="info">📊 Breakdown:</span>\n`;
+                output.innerHTML += `  • ${sampleExpenses.length} expenses\n`;
+                output.innerHTML += `  • ${sampleMoods.length} moods\n`;
+                output.innerHTML += `  • ${sampleTodos.length} todos\n`;
+                output.innerHTML += `  • ${sampleHealth.length} health records\n\n`;
+                output.innerHTML += `<span class="info">Now try the summary queries above!</span>`;
+
+                showStatus('Sample data created successfully!', 'success');
+            } catch (error) {
+                output.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+                showStatus('Failed to create sample data', 'error');
+            }
+        }
+
+        async function testQuery(query, description) {
+            if (!OneLifeAvailable) {
+                showStatus('OneLife is not available.', 'error');
+                return;
+            }
+
+            const output = document.getElementById('queryOutput');
+            output.style.display = 'block';
+            output.innerHTML = `<span class="info">🔍 Query: "${query}"</span>\n`;
+            output.innerHTML += `<span class="info">📝 Description: ${description}</span>\n\n`;
+
+            try {
+                await OneLife.DB.init();
+
+                const lower = query.toLowerCase();
+                const summaryKeywords = [
+                    'summary', 'summarize', 'report', 'analyze', 'analysis',
+                    'show me', 'tell me about', 'how much', 'what did i',
+                    'monthly', 'weekly', 'daily', 'this month', 'this week',
+                    'expenses', 'spending', 'mood', 'health', 'todos',
+                    'trend', 'insight', 'overview', 'recap'
+                ];
+                const isSummary = summaryKeywords.some(keyword => lower.includes(keyword));
+
+                if (!isSummary) {
+                    output.innerHTML += `<span class="warning">⚠️  Not detected as summary request</span>\n`;
+                    return;
+                }
+
+                let type = null;
+                if (lower.includes('expense') || lower.includes('spending') || lower.includes('spent')) {
+                    type = 'expense';
+                } else if (lower.includes('mood') || lower.includes('feeling')) {
+                    type = 'mood';
+                } else if (lower.includes('health') || lower.includes('exercise') || lower.includes('workout')) {
+                    type = 'health';
+                } else if (lower.includes('todo') || lower.includes('task')) {
+                    type = 'todo';
+                }
+
+                const now = new Date();
+                let timeRange = 'all';
+                let cutoffDate = null;
+
+                if (lower.includes('today')) {
+                    timeRange = 'today';
+                    cutoffDate = new Date();
+                    cutoffDate.setHours(0, 0, 0, 0);
+                } else if (lower.includes('this week') || lower.includes('week')) {
+                    timeRange = 'week';
+                    cutoffDate = new Date();
+                    cutoffDate.setDate(cutoffDate.getDate() - 7);
+                } else if (lower.includes('this month') || lower.includes('month')) {
+                    timeRange = 'month';
+                    cutoffDate = new Date();
+                    cutoffDate.setMonth(cutoffDate.getMonth() - 1);
+                }
+
+                const allRecords = await OneLife.DB.getRecords(type);
+                let filteredRecords = allRecords;
+
+                if (cutoffDate) {
+                    filteredRecords = allRecords.filter(record => new Date(record.date) >= cutoffDate);
+                }
+
+                output.innerHTML += `<span class="success">📈 Found ${filteredRecords.length} records</span>\n`;
+                output.innerHTML += `📅 Time range: ${timeRange}\n`;
+                output.innerHTML += `🏷️  Type filter: ${type || 'all'}\n\n`;
+
+                if (filteredRecords.length > 0) {
+                    const grouped = {};
+                    filteredRecords.forEach(record => {
+                        if (!grouped[record.type]) {
+                            grouped[record.type] = [];
+                        }
+                        grouped[record.type].push(record);
+                    });
+
+                    Object.keys(grouped).forEach(type => {
+                        const typeRecords = grouped[type];
+                        output.innerHTML += `<span class="info">${type.toUpperCase()} (${typeRecords.length}):</span>\n`;
+                        
+                        typeRecords.slice(0, 5).forEach(record => {
+                            const date = new Date(record.date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric'
+                            });
+                            
+                            if (type === 'expense') {
+                                output.innerHTML += `  • ${date}: $${record.amount} - ${record.category}\n`;
+                            } else if (type === 'mood') {
+                                output.innerHTML += `  • ${date}: ${record.mood} - ${record.description.substring(0, 30)}\n`;
+                            } else if (type === 'todo') {
+                                output.innerHTML += `  • ${date}: ${record.completed ? '✅' : '⏳'} ${record.description}\n`;
+                            } else {
+                                output.innerHTML += `  • ${date}: ${record.description.substring(0, 40)}\n`;
+                            }
+                        });
+                        
+                        if (typeRecords.length > 5) {
+                            output.innerHTML += `  ... and ${typeRecords.length - 5} more\n`;
+                        }
+                        output.innerHTML += '\n';
+                    });
+
+                    const expenses = grouped['expense'] || [];
+                    if (expenses.length > 0) {
+                        const total = expenses.reduce((sum, r) => sum + (r.amount || 0), 0);
+                        const avg = total / expenses.length;
+                        const byCategory = {};
+                        expenses.forEach(e => {
+                            byCategory[e.category] = (byCategory[e.category] || 0) + e.amount;
+                        });
+                        
+                        output.innerHTML += `<span class="success">💰 Expense Statistics:</span>\n`;
+                        output.innerHTML += `  Total: $${total.toFixed(2)}\n`;
+                        output.innerHTML += `  Average: $${avg.toFixed(2)}\n`;
+                        output.innerHTML += `  By Category:\n`;
+                        Object.entries(byCategory).forEach(([cat, amt]) => {
+                            output.innerHTML += `    ${cat}: $${amt.toFixed(2)}\n`;
+                        });
+                        output.innerHTML += '\n';
+                    }
+
+                    const moods = grouped['mood'] || [];
+                    if (moods.length > 0) {
+                        const moodCounts = {};
+                        moods.forEach(m => {
+                            const mood = m.mood || 'Neutral';
+                            moodCounts[mood] = (moodCounts[mood] || 0) + 1;
+                        });
+                        
+                        output.innerHTML += `<span class="success">😊 Mood Statistics:</span>\n`;
+                        Object.entries(moodCounts).forEach(([mood, count]) => {
+                            const percentage = ((count / moods.length) * 100).toFixed(1);
+                            output.innerHTML += `  ${mood}: ${count} (${percentage}%)\n`;
+                        });
+                        output.innerHTML += '\n';
+                    }
+
+                    const todos = grouped['todo'] || [];
+                    if (todos.length > 0) {
+                        const completed = todos.filter(t => t.completed).length;
+                        output.innerHTML += `<span class="success">📅 Todo Statistics:</span>\n`;
+                        output.innerHTML += `  Completed: ${completed}\n`;
+                        output.innerHTML += `  Pending: ${todos.length - completed}\n`;
+                        output.innerHTML += `  Completion rate: ${((completed / todos.length) * 100).toFixed(1)}%\n`;
+                    }
+                } else {
+                    output.innerHTML += `<span class="warning">ℹ️  No records found for this query</span>\n`;
+                }
+
+                output.innerHTML += `\n<span class="info">💡 In the actual AI Chat, the AI would analyze this data and generate a natural language summary!</span>`;
+
+            } catch (error) {
+                output.innerHTML += `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function cleanupData() {
+            if (!OneLifeAvailable) {
+                showStatus('OneLife is not available.', 'error');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete all demo data? This cannot be undone.')) {
+                return;
+            }
+
+            try {
+                await OneLife.DB.init();
+                const allRecords = await OneLife.DB.getRecords();
+                
+                for (const record of allRecords) {
+                    await OneLife.DB.deleteRecord(record.id);
+                }
+
+                showStatus(`Successfully deleted ${allRecords.length} records`, 'success');
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Load example queries
+        const exampleQueries = [
+            'Show me my expenses this month',
+            'What did I spend today?',
+            'Summarize my mood this week',
+            'Generate a report on my spending',
+            'Tell me about my expenses',
+            'Analyze my mood trends',
+            'What are my todos?',
+            'Show me my health data',
+            'How much did I spend on food this week?',
+            'What\'s my spending breakdown by category?',
+        ];
+
+        const queriesContainer = document.getElementById('exampleQueries');
+        exampleQueries.forEach(query => {
+            const item = document.createElement('div');
+            item.className = 'query-item';
+            item.textContent = query;
+            item.onclick = () => {
+                navigator.clipboard.writeText(query).then(() => {
+                    showStatus('Query copied to clipboard!', 'success');
+                });
+            };
+            queriesContainer.appendChild(item);
+        });
+    </script>
+</body>
+</html>
+
