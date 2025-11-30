@@ -21,45 +21,57 @@ function drawIcon(size, isLarge = false) {
     const canvas = createCanvas(size, size);
     const ctx = canvas.getContext('2d');
     
-    // Background gradient (dark theme)
-    const gradient = ctx.createLinearGradient(0, 0, size, size);
-    gradient.addColorStop(0, '#0a0e27');
-    gradient.addColorStop(0.5, '#1a1f3a');
-    gradient.addColorStop(1, '#667eea');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, size, size);
+    // Transparent background (will work on any background)
+    ctx.clearRect(0, 0, size, size);
     
     const centerX = size / 2;
     const centerY = size / 2;
     const scale = size / 512;
     
-    // Draw AI brain/circuit pattern
-    ctx.strokeStyle = '#667eea';
-    ctx.fillStyle = '#667eea';
-    ctx.lineWidth = 3 * scale;
+    // Create bright gradient for the main icon
+    const iconGradient = ctx.createLinearGradient(0, 0, size, size);
+    iconGradient.addColorStop(0, '#ffffff');
+    iconGradient.addColorStop(0.3, '#a8b5ff');
+    iconGradient.addColorStop(0.7, '#667eea');
+    iconGradient.addColorStop(1, '#764ba2');
     
-    // Main circle (AI core)
-    const mainRadius = 120 * scale;
+    // Draw AI brain/circuit pattern with bright colors
+    ctx.strokeStyle = iconGradient;
+    ctx.fillStyle = iconGradient;
+    ctx.lineWidth = 4 * scale;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    
+    // Add glow effect
+    ctx.shadowColor = 'rgba(102, 126, 234, 0.8)';
+    ctx.shadowBlur = 8 * scale;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    // Main circle (AI core) - brighter and more visible
+    const mainRadius = 110 * scale;
     ctx.beginPath();
     ctx.arc(centerX, centerY, mainRadius, 0, Math.PI * 2);
     ctx.stroke();
     
-    // Inner circle
+    // Inner circle with glow
+    ctx.shadowBlur = 6 * scale;
     ctx.beginPath();
-    ctx.arc(centerX, centerY, mainRadius * 0.6, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, mainRadius * 0.65, 0, Math.PI * 2);
     ctx.stroke();
     
-    // Circuit nodes
+    // Circuit nodes - brighter
     const nodeCount = 8;
+    ctx.shadowBlur = 4 * scale;
     for (let i = 0; i < nodeCount; i++) {
         const angle = (Math.PI * 2 * i) / nodeCount;
         const nodeRadius = mainRadius * 0.8;
         const nodeX = centerX + Math.cos(angle) * nodeRadius;
         const nodeY = centerY + Math.sin(angle) * nodeRadius;
         
-        // Draw node
+        // Draw glowing node
         ctx.beginPath();
-        ctx.arc(nodeX, nodeY, 8 * scale, 0, Math.PI * 2);
+        ctx.arc(nodeX, nodeY, 10 * scale, 0, Math.PI * 2);
         ctx.fill();
         
         // Draw connection lines
@@ -75,19 +87,29 @@ function drawIcon(size, isLarge = false) {
         }
     }
     
-    // Local/Privacy indicator (small lock in corner)
+    // Add bright center dot
+    ctx.shadowBlur = 8 * scale;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 15 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Local/Privacy indicator (bright green lock in corner)
     if (isLarge && size >= 180) {
-        const lockSize = 40 * scale;
-        const lockX = size - lockSize - 15 * scale;
-        const lockY = 15 * scale;
+        ctx.shadowBlur = 0;
+        const lockSize = 45 * scale;
+        const lockX = size - lockSize - 12 * scale;
+        const lockY = 12 * scale;
         
-        // Lock body
+        // Lock body with bright green
         ctx.fillStyle = '#38ef7d';
-        const lockBodyW = lockSize * 0.6;
+        ctx.shadowColor = 'rgba(56, 239, 125, 0.6)';
+        ctx.shadowBlur = 6 * scale;
+        const lockBodyW = lockSize * 0.65;
         const lockBodyH = lockSize * 0.5;
         const lockBodyX = lockX;
         const lockBodyY = lockY + lockSize * 0.3;
-        const lockRadius = 3 * scale;
+        const lockRadius = 4 * scale;
         ctx.beginPath();
         ctx.moveTo(lockBodyX + lockRadius, lockBodyY);
         ctx.lineTo(lockBodyX + lockBodyW - lockRadius, lockBodyY);
@@ -103,19 +125,27 @@ function drawIcon(size, isLarge = false) {
         
         // Lock shackle
         ctx.strokeStyle = '#38ef7d';
-        ctx.lineWidth = 4 * scale;
+        ctx.lineWidth = 5 * scale;
+        ctx.shadowBlur = 4 * scale;
         ctx.beginPath();
-        ctx.arc(lockX + lockSize * 0.3, lockY + lockSize * 0.3, lockSize * 0.2, Math.PI, 0, false);
+        ctx.arc(lockX + lockSize * 0.3, lockY + lockSize * 0.3, lockSize * 0.22, Math.PI, 0, false);
         ctx.stroke();
     }
     
-    // Text for large icons
+    // Reset shadow
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+    
+    // Text for large icons - bright white
     if (isLarge && size >= 180) {
         ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${Math.max(24, 50*scale)}px Arial`;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 4 * scale;
+        ctx.font = `bold ${Math.max(28, 55*scale)}px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('OL', centerX, centerY + mainRadius + 30*scale);
+        ctx.fillText('OL', centerX, centerY + mainRadius + 35*scale);
+        ctx.shadowBlur = 0;
     }
     
     return canvas;
