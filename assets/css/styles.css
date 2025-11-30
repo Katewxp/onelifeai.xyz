@@ -59,24 +59,6 @@ body {
     width: 100%;
 }
 
-.nav-support {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-left: 20px;
-    white-space: nowrap;
-}
-
-.nav-support a {
-    color: #38ef7d;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.nav-support a:hover {
-    color: #667eea;
-    text-decoration: underline;
-}
-
 .nav-logo {
     font-size: 1.5rem;
     font-weight: 700;
@@ -419,6 +401,22 @@ body {
     padding-top: 30px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-support {
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.footer-support a {
+    color: #38ef7d;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.footer-support a:hover {
+    color: #667eea;
+    text-decoration: underline;
 }
 
 /* Responsive */
