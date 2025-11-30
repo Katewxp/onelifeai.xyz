@@ -18,6 +18,7 @@ const getSettings = () => {
     return OneLife.Storage.get('settings', {
         gradientParallaxUrl: 'http://localhost:3001',
         model: 'Qwen/Qwen3-0.6B',
+        apiKey: '',
         temperature: 0.7,
         maxTokens: 2048
     });
